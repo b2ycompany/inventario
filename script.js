@@ -1,13 +1,12 @@
 let pecas = JSON.parse(localStorage.getItem('estoque')) || [];
 
-document.addEventListener("DOMContentLoaded", atualizarTabela);
-
 function atualizarTabela() {
     const tabela = document.getElementById("estoque");
     tabela.innerHTML = "";
     pecas.forEach((peca, index) => {
         tabela.innerHTML += `
             <tr>
+                <td>${peca.codigo}</td>
                 <td>${peca.nome}</td>
                 <td>${peca.quantidade}</td>
                 <td>
@@ -22,10 +21,11 @@ function atualizarTabela() {
 }
 
 function adicionarPeca() {
+    const codigo = document.getElementById("codigoPeca").value;
     const nome = document.getElementById("nomePeca").value;
     const quantidade = parseInt(document.getElementById("quantidade").value);
-    if (nome && quantidade > 0) {
-        pecas.push({ nome, quantidade });
+    if (codigo && nome && quantidade > 0) {
+        pecas.push({ codigo, nome, quantidade });
         atualizarTabela();
     }
 }
@@ -40,3 +40,16 @@ function removerPeca(index) {
     pecas.splice(index, 1);
     atualizarTabela();
 }
+
+function buscarPeca() {
+    const codigoBusca = document.getElementById("buscarCodigo").value;
+    const resultado = pecas.find(peca => peca.codigo === codigoBusca);
+    
+    if (resultado) {
+        document.getElementById("resultadoBusca").innerText = `Peça: ${resultado.nome}, Quantidade: ${resultado.quantidade}`;
+    } else {
+        document.getElementById("resultadoBusca").innerText = "Peça não encontrada no estoque.";
+    }
+}
+
+atualizarTabela();
