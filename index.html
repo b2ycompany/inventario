@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Estoque</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        button { margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Cadastro de Peças</h2>
+        <input type="text" id="nomePeca" placeholder="Nome da peça">
+        <input type="number" id="quantidade" placeholder="Quantidade">
+        <button onclick="adicionarPeca()">Adicionar</button>
+        <h2>Estoque</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Peça</th>
+                    <th>Quantidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="estoque"></tbody>
+        </table>
+    </div>
+    
+    <script>
+        let pecas = JSON.parse(localStorage.getItem('estoque')) || [];
+        
+        function atualizarTabela() {
+            const tabela = document.getElementById("estoque");
+            tabela.innerHTML = "";
+            pecas.forEach((peca, index) => {
+                tabela.innerHTML += `
+                    <tr>
+                        <td>${peca.nome}</td>
+                        <td>${peca.quantidade}</td>
+                        <td>
+                            <button onclick="alterarQuantidade(${index}, 1)">+1</button>
+                            <button onclick="alterarQuantidade(${index}, -1)">-1</button>
+                            <button onclick="removerPeca(${index})">Remover</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            localStorage.setItem('estoque', JSON.stringify(pecas));
+        }
+        
+        function adicionarPeca() {
+            const nome = document.getElementById("nomePeca").value;
+            const quantidade = parseInt(document.getElementById("quantidade").value);
+            if (nome && quantidade > 0) {
+                pecas.push({ nome, quantidade });
+                atualizarTabela();
+            }
+        }
+        
+        function alterarQuantidade(index, valor) {
+            pecas[index].quantidade += valor;
+            if (pecas[index].quantidade < 0) pecas[index].quantidade = 0;
+            atualizarTabela();
+        }
+        
+        function removerPeca(index) {
+            pecas.splice(index, 1);
+            atualizarTabela();
+        }
+        
+        atualizarTabela();
+    </script>
+</body>
+</html>
