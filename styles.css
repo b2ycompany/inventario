@@ -1,65 +1,55 @@
-/* styles.css - Estilos do Sistema de Inventário */
+/* styles.css - Estilização do Inventário */
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background-color: #f4f4f4;
 }
 
 .container {
-    background: white;
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 800px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
 }
 
-h2 {
+h2, h3 {
     text-align: center;
-    color: #333;
-    width: 100%;
 }
 
 .form-container {
-    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 input, button {
-    width: 100%;
     padding: 10px;
-    margin: 5px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
-    font-size: 16px;
 }
 
 button {
-    background-color: #28a745;
+    background-color: #007bff;
     color: white;
     border: none;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #0056b3;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 table, th, td {
@@ -71,29 +61,42 @@ th, td {
     text-align: center;
 }
 
-th {
-    background-color: #007bff;
-    color: white;
+.image-preview {
+    max-width: 80px;
+    height: auto;
+    border-radius: 5px;
 }
 
 .indicators {
-    width: 100%;
     display: flex;
     justify-content: space-around;
     margin-top: 20px;
 }
 
 .indicator {
-    background: #f8f9fa;
+    background: #007bff;
+    color: white;
     padding: 10px;
     border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     text-align: center;
+    flex: 1;
+    margin: 5px;
 }
 
-.image-preview {
-    max-width: 100px;
-    max-height: 100px;
-    display: block;
-    margin-top: 10px;
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    .indicators {
+        flex-direction: column;
+    }
+
+    .indicator {
+        margin-bottom: 10px;
+    }
+
+    table, th, td {
+        font-size: 14px;
+    }
 }
