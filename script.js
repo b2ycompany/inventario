@@ -1,21 +1,22 @@
-// script.js - Sistema de Inventário com Firebase + ImgBB
-
 // Configuração do Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyBZUHSvfX-rCPv0kF3y1jgoxzLjz-xF1zU",
-    authDomain: "inventario-82fd5.firebaseapp.com",
-    projectId: "inventario-82fd5",
-    storageBucket: "inventario-82fd5.appspot.com", // Corrigido
-    messagingSenderId: "505042062581",
-    appId: "1:505042062581:web:89a491d9394294a76949bc"
+    apiKey: "SUA_API_KEY",
+    authDomain: "SUA_AUTH_DOMAIN",
+    projectId: "SEU_PROJECT_ID",
+    storageBucket: "SEU_STORAGE_BUCKET",
+    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+    appId: "SEU_APP_ID"
 };
 
+// Inicializa o Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
 
 // Configuração do ImgBB
-const imgbbApiKey = "c7150786eeb1856121e2fb3568c8e44a";
+const imgbbApiKey = "SUA_IMGBB_API_KEY";
 
+// Atualizar a tabela com os dados do Firestore
 function atualizarTabela() {
     db.collection("pecas").get().then(snapshot => {
         const tabela = document.getElementById("estoque");
@@ -39,6 +40,7 @@ function atualizarTabela() {
     }).catch(error => console.error("Erro ao atualizar a tabela:", error));
 }
 
+// Adicionar nova peça
 function adicionarPeca() {
     const codigo = document.getElementById("codigoPeca").value.trim();
     const nome = document.getElementById("nomePeca").value.trim();
@@ -70,6 +72,7 @@ function adicionarPeca() {
     .catch(error => console.error("Erro ao adicionar peça:", error));
 }
 
+// Exibir imagem de pré-visualização antes do upload
 function mostrarImagemPreview() {
     const imagemFile = document.getElementById("imagemPeca").files[0];
     if (imagemFile) {
