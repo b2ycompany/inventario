@@ -78,5 +78,37 @@ function removerPeca(id) {
     }).catch(error => console.error("Erro ao remover peça:", error));
 }
 
+// Buscar peça
+function buscarPeca() {
+    const termo = document.getElementById("buscarCodigo").value.trim().toLowerCase();
+    db.collection("pecas").get().then(snapshot => {
+        const resultado = document.getElementById("resultadoBusca");
+        resultado.innerHTML = "";
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            if (peca.codigo.toLowerCase().includes(termo) || peca.nome.toLowerCase().includes(termo)) {
+                resultado.insertAdjacentHTML("beforeend", `
+                    <div>
+                        <p><strong>${peca.nome}</strong> (${peca.codigo}) - ${peca.quantidade} unidades</p>
+                        <img src="${peca.imagem}" class="image-preview">
+                    </div>
+                `);
+            }
+        });
+    });
+}
+
+// Gerar relatório
+function gerarRelatorio() {
+    db.collection("pecas").get().then(snapshot => {
+        let relatorio = "";
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            relatorio += `${peca.nome} (${peca.codigo}): ${peca.quantidade} unidades\n`;
+        });
+        document.getElementById("relatorio").textContent = relatorio;
+    });
+}
+
 // Inicializa a tabela ao carregar a página
 atualizarTabela();
