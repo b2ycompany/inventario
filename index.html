@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventário de Peças</title>
+    <title>Inventário Futurista</title>
     <link rel="stylesheet" href="styles.css">
     
     <!-- Firebase SDK -->
@@ -18,26 +18,20 @@
     </header>
 
     <div class="container">
-        <!-- Formulário de Cadastro -->
         <div class="form-container">
             <h2>Adicionar Peça</h2>
             <input type="text" id="codigoPeca" placeholder="Código da Peça">
             <input type="text" id="nomePeca" placeholder="Nome da Peça">
             <input type="number" id="quantidade" placeholder="Quantidade">
-            <input type="file" id="imagemPeca" accept="image/*" onchange="mostrarImagemPreview()">
-            <div id="previewContainer">
-                <img id="imagemPreview" src="" alt="Prévia da Imagem">
-            </div>
+            <input type="file" id="imagemPeca" accept="image/*">
             <button onclick="adicionarPeca()">Adicionar Peça</button>
         </div>
 
-        <!-- Busca -->
         <h3>Buscar Peça</h3>
         <input type="text" id="buscarCodigo" placeholder="Código ou Nome da Peça">
         <button onclick="buscarPeca()">Buscar</button>
         <div id="resultadoBusca"></div>
 
-        <!-- Tabela do Estoque -->
         <h3>Estoque</h3>
         <table>
             <thead>
@@ -52,7 +46,6 @@
             <tbody id="estoque"></tbody>
         </table>
 
-        <!-- Indicadores -->
         <h3>Indicadores</h3>
         <div class="indicators">
             <div class="indicator" id="indicadorEstoque">Mais em estoque: Nenhum</div>
@@ -60,13 +53,11 @@
             <div class="indicator" id="indicadorEntrada">Mais entrada: Nenhum</div>
         </div>
 
-        <!-- Relatório -->
         <h3>Relatório</h3>
         <button onclick="gerarRelatorio()">Gerar Relatório</button>
         <pre id="relatorio"></pre>
     </div>
 
-    <!-- Script Principal -->
     <script src="script.js" defer></script>
 </body>
 </html>
