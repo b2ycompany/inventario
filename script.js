@@ -49,62 +49,16 @@ function adicionarPeca() {
         return;
     }
 
-    const storageRef = storage.ref(`imagens/${codigo}-${imagemFile.name}`);
-    storageRef.put(imagemFile).then(snapshot => snapshot.ref.getDownloadURL())
-    .then(imagemURL => {
+    const storageRef = storage.ref(`imagens/${codigo}`);
+    storageRef.put(imagemFile).then(snapshot => {
+        return snapshot.ref.getDownloadURL();
+    }).then(imagemURL => {
         return db.collection("pecas").add({ codigo, nome, quantidade, imagem: imagemURL });
-    })
-    .then(() => {
+    }).then(() => {
         atualizarTabela();
         document.getElementById("imagemPreview").style.display = "none";
         alert("Peça cadastrada com sucesso!");
-    })
-    .catch(error => console.error("Erro ao adicionar peça:", error));
-}
-
-// Alterar quantidade de uma peça
-function alterarQuantidade(id, valor) {
-    const pecaRef = db.collection("pecas").doc(id);
-    pecaRef.get().then(doc => {
-        if (doc.exists) {
-            const novaQuantidade = doc.data().quantidade + valor;
-            if (novaQuantidade >= 0) {
-                pecaRef.update({ quantidade: novaQuantidade }).then(atualizarTabela);
-            }
-        }
-    });
-}
-
-// Remover uma peça
-function removerPeca(id) {
-    db.collection("pecas").doc(id).delete().then(atualizarTabela);
-}
-
-// Buscar peça
-function buscarPeca() {
-    const termo = document.getElementById("buscarCodigo").value.toLowerCase();
-    db.collection("pecas").get().then(snapshot => {
-        let resultado = "";
-        snapshot.forEach(doc => {
-            const peca = doc.data();
-            if (peca.codigo.toLowerCase().includes(termo) || peca.nome.toLowerCase().includes(termo)) {
-                resultado += `<p>${peca.codigo} - ${peca.nome} (${peca.quantidade} unidades)</p>`;
-            }
-        });
-        document.getElementById("resultadoBusca").innerHTML = resultado || "Nenhuma peça encontrada";
-    });
-}
-
-// Gerar relatório
-function gerarRelatorio() {
-    db.collection("pecas").get().then(snapshot => {
-        let relatorio = "Inventário:\n";
-        snapshot.forEach(doc => {
-            const peca = doc.data();
-            relatorio += `${peca.codigo} - ${peca.nome}: ${peca.quantidade} unidades\n`;
-        });
-        document.getElementById("relatorio").textContent = relatorio;
-    });
+    }).catch(error => console.error("Erro ao adicionar peça:", error));
 }
 
 // Exibir imagem de pré-visualização antes do upload
@@ -120,4 +74,73 @@ function mostrarImagemPreview() {
     }
 }
 
+// Alterar quantidade de peças
+function alterarQuantidade(id, quantidade) {
+    const pecaRef = db.collection("pecas").doc(id);
+    pecaRef.get().then(doc => {
+        if (doc.exists) {
+            const novaQuantidade = doc.data().quantidade + quantidade;
+            if (novaQuantidade >= 0) {
+                return pecaRef.update({ quantidade: novaQuantidade });
+            }
+        }
+    }).then(() => atualizarTabela())
+    .catch(error => console.error("Erro ao alterar quantidade:", error));
+}
+
+// Remover peça
+function removerPeca(id) {
+    db.collection("pecas").doc(id).delete()
+    .then(() => atualizarTabela())
+    .catch(error => console.error("Erro ao remover peça:", error));
+}
+
+// Buscar peça pelo código ou nome
+function buscarPeca() {
+    const termoBusca = document.getElementById("buscarCodigo").value.trim().toLowerCase();
+    db.collection("pecas").get().then(snapshot => {
+        const resultadoBusca = document.getElementById("resultadoBusca");
+        resultadoBusca.innerHTML = "";
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            if (peca.codigo.toLowerCase().includes(termoBusca) || peca.nome.toLowerCase().includes(termoBusca)) {
+                resultadoBusca.insertAdjacentHTML("beforeend", `
+                    <div>
+                        <strong>${peca.codigo}</strong> - ${peca.nome} (Quantidade: ${peca.quantidade})
+                        <img src="${peca.imagem}" class="image-preview">
+                    </div>
+                `);
+            }
+        });
+    }).catch(error => console.error("Erro ao buscar peça:", error));
+}
+
+// Gerar relatório
+function gerarRelatorio() {
+    db.collection("pecas").get().then(snapshot => {
+        let relatorio = "Relatório de Estoque:\n";
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            relatorio += `Código: ${peca.codigo}, Nome: ${peca.nome}, Quantidade: ${peca.quantidade}\n`;
+        });
+        document.getElementById("relatorio").textContent = relatorio;
+    }).catch(error => console.error("Erro ao gerar relatório:", error));
+}
+
+// Atualizar indicadores
+function atualizarIndicadores() {
+    db.collection("pecas").get().then(snapshot => {
+        let maisEstoque = { nome: "Nenhum", quantidade: 0 };
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            if (peca.quantidade > maisEstoque.quantidade) {
+                maisEstoque = { nome: peca.nome, quantidade: peca.quantidade };
+            }
+        });
+        document.getElementById("indicadorEstoque").textContent = `Mais em estoque: ${maisEstoque.nome} (${maisEstoque.quantidade})`;
+    }).catch(error => console.error("Erro ao atualizar indicadores:", error));
+}
+
+// Inicializa tudo
 atualizarTabela();
+atualizarIndicadores();
