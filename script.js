@@ -1,11 +1,11 @@
 // Configuração do Firebase
 const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SUA_AUTH_DOMAIN",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_STORAGE_BUCKET",
-    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyBZUHSvfX-rCPv0kF3y1jgoxzLjz-xF1zU",
+    authDomain: "inventario-82fd5.firebaseapp.com",
+    projectId: "inventario-82fd5",
+    storageBucket: "inventario-82fd5.appspot.com",
+    messagingSenderId: "505042062581",
+    appId: "1:505042062581:web:89a491d9394294a76949bc"
 };
 
 // Inicializa o Firebase
@@ -14,7 +14,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 
 // Configuração do ImgBB
-const imgbbApiKey = "SUA_IMGBB_API_KEY";
+const imgbbApiKey = "c7150786eeb1856121e2fb3568c8e44a";
 
 // Atualizar a tabela com os dados do Firestore
 function atualizarTabela() {
