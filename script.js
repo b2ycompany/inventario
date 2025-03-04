@@ -13,7 +13,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// Função para atualizar a tabela
+// Atualizar a tabela com os dados do Firestore
 function atualizarTabela() {
     db.collection("pecas").get().then(snapshot => {
         const tabela = document.getElementById("estoque");
@@ -37,7 +37,7 @@ function atualizarTabela() {
     }).catch(error => console.error("Erro ao atualizar a tabela:", error));
 }
 
-// Função para adicionar peça
+// Adicionar nova peça
 function adicionarPeca() {
     const codigo = document.getElementById("codigoPeca").value.trim();
     const nome = document.getElementById("nomePeca").value.trim();
@@ -49,21 +49,65 @@ function adicionarPeca() {
         return;
     }
 
-    const reader = new FileReader();
-    reader.onload = function (event) {
-        const imagemBase64 = event.target.result;
-        return db.collection("pecas").add({ codigo, nome, quantidade, imagem: imagemBase64 })
-            .then(() => {
-                atualizarTabela();
-                document.getElementById("imagemPreview").style.display = "none";
-                alert("Peça cadastrada com sucesso!");
-            })
-            .catch(error => console.error("Erro ao adicionar peça:", error));
-    };
-    reader.readAsDataURL(imagemFile);
+    const storageRef = storage.ref(`imagens/${codigo}-${imagemFile.name}`);
+    storageRef.put(imagemFile).then(snapshot => snapshot.ref.getDownloadURL())
+    .then(imagemURL => {
+        return db.collection("pecas").add({ codigo, nome, quantidade, imagem: imagemURL });
+    })
+    .then(() => {
+        atualizarTabela();
+        document.getElementById("imagemPreview").style.display = "none";
+        alert("Peça cadastrada com sucesso!");
+    })
+    .catch(error => console.error("Erro ao adicionar peça:", error));
 }
 
-// Função para exibir prévia da imagem
+// Alterar quantidade de uma peça
+function alterarQuantidade(id, valor) {
+    const pecaRef = db.collection("pecas").doc(id);
+    pecaRef.get().then(doc => {
+        if (doc.exists) {
+            const novaQuantidade = doc.data().quantidade + valor;
+            if (novaQuantidade >= 0) {
+                pecaRef.update({ quantidade: novaQuantidade }).then(atualizarTabela);
+            }
+        }
+    });
+}
+
+// Remover uma peça
+function removerPeca(id) {
+    db.collection("pecas").doc(id).delete().then(atualizarTabela);
+}
+
+// Buscar peça
+function buscarPeca() {
+    const termo = document.getElementById("buscarCodigo").value.toLowerCase();
+    db.collection("pecas").get().then(snapshot => {
+        let resultado = "";
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            if (peca.codigo.toLowerCase().includes(termo) || peca.nome.toLowerCase().includes(termo)) {
+                resultado += `<p>${peca.codigo} - ${peca.nome} (${peca.quantidade} unidades)</p>`;
+            }
+        });
+        document.getElementById("resultadoBusca").innerHTML = resultado || "Nenhuma peça encontrada";
+    });
+}
+
+// Gerar relatório
+function gerarRelatorio() {
+    db.collection("pecas").get().then(snapshot => {
+        let relatorio = "Inventário:\n";
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            relatorio += `${peca.codigo} - ${peca.nome}: ${peca.quantidade} unidades\n`;
+        });
+        document.getElementById("relatorio").textContent = relatorio;
+    });
+}
+
+// Exibir imagem de pré-visualização antes do upload
 function mostrarImagemPreview() {
     const imagemFile = document.getElementById("imagemPeca").files[0];
     if (imagemFile) {
@@ -76,5 +120,4 @@ function mostrarImagemPreview() {
     }
 }
 
-// Iniciar atualização da tabela
-document.addEventListener("DOMContentLoaded", atualizarTabela);
+atualizarTabela();
