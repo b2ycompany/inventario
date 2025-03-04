@@ -13,10 +13,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// Configuração do ImgBB
-const imgbbApiKey = "c7150786eeb1856121e2fb3568c8e44a";
-
-// Atualizar a tabela com os dados do Firestore
+// Função para atualizar a tabela
 function atualizarTabela() {
     db.collection("pecas").get().then(snapshot => {
         const tabela = document.getElementById("estoque");
@@ -40,7 +37,7 @@ function atualizarTabela() {
     }).catch(error => console.error("Erro ao atualizar a tabela:", error));
 }
 
-// Adicionar nova peça
+// Função para adicionar peça
 function adicionarPeca() {
     const codigo = document.getElementById("codigoPeca").value.trim();
     const nome = document.getElementById("nomePeca").value.trim();
@@ -52,27 +49,21 @@ function adicionarPeca() {
         return;
     }
 
-    const formData = new FormData();
-    formData.append("image", imagemFile);
-
-    fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
-        method: "POST",
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        const imagemURL = data.data.url;
-        return db.collection("pecas").add({ codigo, nome, quantidade, imagem: imagemURL });
-    })
-    .then(() => {
-        atualizarTabela();
-        document.getElementById("imagemPreview").style.display = "none";
-        alert("Peça cadastrada com sucesso!");
-    })
-    .catch(error => console.error("Erro ao adicionar peça:", error));
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const imagemBase64 = event.target.result;
+        return db.collection("pecas").add({ codigo, nome, quantidade, imagem: imagemBase64 })
+            .then(() => {
+                atualizarTabela();
+                document.getElementById("imagemPreview").style.display = "none";
+                alert("Peça cadastrada com sucesso!");
+            })
+            .catch(error => console.error("Erro ao adicionar peça:", error));
+    };
+    reader.readAsDataURL(imagemFile);
 }
 
-// Exibir imagem de pré-visualização antes do upload
+// Função para exibir prévia da imagem
 function mostrarImagemPreview() {
     const imagemFile = document.getElementById("imagemPeca").files[0];
     if (imagemFile) {
@@ -85,4 +76,5 @@ function mostrarImagemPreview() {
     }
 }
 
-atualizarTabela();
+// Iniciar atualização da tabela
+document.addEventListener("DOMContentLoaded", atualizarTabela);
