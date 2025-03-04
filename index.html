@@ -16,16 +16,17 @@
         <img src="logo.png" alt="Logo da Empresa" class="logo">
         <h1>Controle de Inventário</h1>
     </header>
-    
+
     <div class="container">
         <!-- Formulário de Cadastro -->
         <div class="form-container">
+            <h2>Adicionar Peça</h2>
             <input type="text" id="codigoPeca" placeholder="Código da Peça">
             <input type="text" id="nomePeca" placeholder="Nome da Peça">
             <input type="number" id="quantidade" placeholder="Quantidade">
             <input type="file" id="imagemPeca" accept="image/*" onchange="mostrarImagemPreview()">
             <div id="previewContainer">
-                <img id="imagemPreview" src="" alt="Prévia da Imagem" style="display:none; width: 100px;">
+                <img id="imagemPreview" src="" alt="Prévia da Imagem">
             </div>
             <button onclick="adicionarPeca()">Adicionar Peça</button>
         </div>
