@@ -1,7 +1,18 @@
-// Referência ao Firestore
+// script.js - Sistema de Inventário com Firebase + ImgBB
+
+// Configuração do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBZUHSvfX-rCPv0kF3y1jgoxzLjz-xF1zU",
+    authDomain: "inventario-82fd5.firebaseapp.com",
+    projectId: "inventario-82fd5",
+    storageBucket: "inventario-82fd5.appspot.com",
+    messagingSenderId: "505042062581",
+    appId: "1:505042062581:web:89a491d9394294a76949bc"
+};
+
+firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Atualiza a Tabela de Estoque
 function atualizarTabela() {
     db.collection("pecas").get().then(snapshot => {
         const tabela = document.getElementById("estoque");
@@ -26,14 +37,12 @@ function atualizarTabela() {
     }).catch(error => console.error("Erro ao atualizar a tabela:", error));
 }
 
-// Adiciona uma nova peça
 function adicionarPeca() {
     const codigo = document.getElementById("codigoPeca").value.trim();
     const nome = document.getElementById("nomePeca").value.trim();
     const quantidade = parseInt(document.getElementById("quantidade").value);
-    const imagemFile = document.getElementById("imagemPeca").files[0];
 
-    if (!codigo || !nome || quantidade <= 0 || !imagemFile) {
+    if (!codigo || !nome || quantidade <= 0) {
         alert("Preencha todos os campos corretamente!");
         return;
     }
@@ -43,24 +52,13 @@ function adicionarPeca() {
             alert(`O código ${codigo} já está cadastrado.`);
             return;
         }
-
-        const reader = new FileReader();
-        reader.onloadend = function () {
-            const imagemBase64 = reader.result;
-
-            db.collection("pecas").add({
-                codigo, nome, quantidade, imagem: imagemBase64
-            }).then(() => {
-                atualizarTabela();
-                alert("Peça cadastrada com sucesso!");
-            }).catch(error => console.error("Erro ao adicionar peça:", error));
-        };
-
-        reader.readAsDataURL(imagemFile);
-    }).catch(error => console.error("Erro ao verificar código existente:", error));
+        return db.collection("pecas").add({ codigo, nome, quantidade, imagem: "" });
+    }).then(() => {
+        atualizarTabela();
+        alert("Peça cadastrada com sucesso!");
+    }).catch(error => console.error("Erro ao adicionar peça:", error));
 }
 
-// Altera quantidade de uma peça
 function alterarQuantidade(id, valor) {
     db.collection("pecas").doc(id).get().then(doc => {
         if (doc.exists) {
@@ -71,12 +69,40 @@ function alterarQuantidade(id, valor) {
     .catch(error => console.error("Erro ao alterar quantidade:", error));
 }
 
-// Remove uma peça do inventário
 function removerPeca(id) {
     db.collection("pecas").doc(id).delete().then(() => {
         atualizarTabela();
     }).catch(error => console.error("Erro ao remover peça:", error));
 }
 
-// Atualiza a tabela ao carregar
+function buscarPeca() {
+    const termoBusca = document.getElementById("buscarCodigo").value.trim().toLowerCase();
+    if (!termoBusca) {
+        document.getElementById("resultadoBusca").innerText = "Digite um código ou nome para buscar.";
+        return;
+    }
+
+    db.collection("pecas").get().then(snapshot => {
+        let resultado = null;
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            if (peca.codigo.toLowerCase() === termoBusca || peca.nome.toLowerCase().includes(termoBusca)) {
+                resultado = peca;
+            }
+        });
+
+        if (resultado) {
+            document.getElementById("resultadoBusca").innerHTML = `
+                <div class='resultado-card'>
+                    <p><strong>Código:</strong> ${resultado.codigo}</p>
+                    <p><strong>Nome:</strong> ${resultado.nome}</p>
+                    <p><strong>Quantidade:</strong> ${resultado.quantidade}</p>
+                </div>
+            `;
+        } else {
+            document.getElementById("resultadoBusca").innerText = "Peça não encontrada no inventário.";
+        }
+    }).catch(error => console.error("Erro ao buscar peça:", error));
+}
+
 atualizarTabela();
