@@ -1,106 +1,60 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Inventário</title>
+    <title>Inventário de Peças</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h2>Cadastro de Peças</h2>
-        <input type="text" id="codigoPeca" placeholder="Código da peça">
-        <input type="text" id="nomePeca" placeholder="Nome da peça">
-        <input type="number" id="quantidade" placeholder="Quantidade">
-        <button onclick="adicionarPeca()">Adicionar</button>
-        
-        <h2>Buscar Peça</h2>
-        <input type="text" id="buscarCodigo" placeholder="Código da peça">
+        <h2>Controle de Inventário</h2>
+
+        <div class="form-container">
+            <input type="text" id="codigoPeca" placeholder="Código da Peça">
+            <input type="text" id="nomePeca" placeholder="Nome da Peça">
+            <input type="number" id="quantidade" placeholder="Quantidade">
+            <input type="file" id="imagemPeca" accept="image/*">
+            <button onclick="adicionarPeca()">Adicionar Peça</button>
+        </div>
+
+        <h3>Buscar Peça</h3>
+        <input type="text" id="buscarCodigo" placeholder="Código da Peça">
         <button onclick="buscarPeca()">Buscar</button>
         <p id="resultadoBusca"></p>
-        
-        <h2>Inventário</h2>
+
+        <h3>Estoque</h3>
         <table>
             <thead>
                 <tr>
                     <th>Código</th>
-                    <th>Peça</th>
+                    <th>Nome</th>
+                    <th>Imagem</th>
                     <th>Quantidade</th>
                     <th>Ações</th>
                 </tr>
             </thead>
             <tbody id="estoque"></tbody>
         </table>
-        
-        <h2>Relatórios</h2>
+
+        <h3>Indicadores</h3>
+        <div class="indicators">
+            <div class="indicator" id="indicadorEstoque">Mais em estoque: Nenhum</div>
+            <div class="indicator" id="indicadorRetirada">Mais retirado: Nenhum</div>
+            <div class="indicator" id="indicadorEntrada">Mais entrada: Nenhum</div>
+        </div>
+
+        <h3>Relatório</h3>
         <button onclick="gerarRelatorio()">Gerar Relatório</button>
         <pre id="relatorio"></pre>
     </div>
-    
-    <script>
-        let pecas = JSON.parse(localStorage.getItem('inventario')) || [];
-        
-        function atualizarTabela() {
-            const tabela = document.getElementById("estoque");
-            tabela.innerHTML = "";
-            pecas.forEach((peca, index) => {
-                tabela.innerHTML += `
-                    <tr>
-                        <td>${peca.codigo}</td>
-                        <td>${peca.nome}</td>
-                        <td>${peca.quantidade}</td>
-                        <td>
-                            <button onclick="alterarQuantidade(${index}, 1)">+1</button>
-                            <button onclick="alterarQuantidade(${index}, -1)">-1</button>
-                            <button onclick="removerPeca(${index})">Remover</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            localStorage.setItem('inventario', JSON.stringify(pecas));
-        }
-        
-        function adicionarPeca() {
-            const codigo = document.getElementById("codigoPeca").value;
-            const nome = document.getElementById("nomePeca").value;
-            const quantidade = parseInt(document.getElementById("quantidade").value);
-            if (codigo && nome && quantidade > 0) {
-                pecas.push({ codigo, nome, quantidade });
-                atualizarTabela();
-            }
-        }
-        
-        function alterarQuantidade(index, valor) {
-            pecas[index].quantidade += valor;
-            if (pecas[index].quantidade < 0) pecas[index].quantidade = 0;
-            atualizarTabela();
-        }
-        
-        function removerPeca(index) {
-            pecas.splice(index, 1);
-            atualizarTabela();
-        }
-        
-        function buscarPeca() {
-            const codigoBusca = document.getElementById("buscarCodigo").value;
-            const resultado = pecas.find(peca => peca.codigo === codigoBusca);
-            
-            if (resultado) {
-                document.getElementById("resultadoBusca").innerText = `Peça: ${resultado.nome}, Quantidade: ${resultado.quantidade}`;
-            } else {
-                document.getElementById("resultadoBusca").innerText = "Peça não encontrada no inventário.";
-            }
-        }
-        
-        function gerarRelatorio() {
-            let relatorio = "Relatório de Inventário:\n";
-            pecas.forEach(peca => {
-                relatorio += `Código: ${peca.codigo}, Peça: ${peca.nome}, Quantidade: ${peca.quantidade}\n`;
-            });
-            document.getElementById("relatorio").innerText = relatorio;
-        }
-        
-        atualizarTabela();
-    </script>
+
+    <script src="script.js"></script>
 </body>
 </html>
+
+
+
+
+
+
