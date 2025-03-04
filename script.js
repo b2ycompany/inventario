@@ -1,18 +1,20 @@
+// script.js - Sistema de Inventário com Firebase + ImgBB
+
 // Configuração do Firebase
 const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SUA_AUTH_DOMAIN",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_STORAGE_BUCKET",
-    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-    appId: "SEU_APP_ID"
+    apiKey: "AIzaSyBZUHSvfX-rCPv0kF3y1jgoxzLjz-xF1zU",
+    authDomain: "inventario-82fd5.firebaseapp.com",
+    projectId: "inventario-82fd5",
+    storageBucket: "inventario-82fd5.appspot.com", // Corrigido
+    messagingSenderId: "505042062581",
+    appId: "1:505042062581:web:89a491d9394294a76949bc"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // Configuração do ImgBB
-const imgbbApiKey = "SUA_IMGBB_API_KEY";
+const imgbbApiKey = "c7150786eeb1856121e2fb3568c8e44a";
 
 function atualizarTabela() {
     db.collection("pecas").get().then(snapshot => {
