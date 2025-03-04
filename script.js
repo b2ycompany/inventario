@@ -21,6 +21,7 @@ function atualizarTabela() {
             </tr>
         `;
     });
+    ajustarLayout();
     atualizarIndicadores();
     localStorage.setItem('inventario', JSON.stringify(pecas));
 }
@@ -85,6 +86,16 @@ function limparCampos() {
     document.getElementById("nomePeca").value = "";
     document.getElementById("quantidade").value = "";
     document.getElementById("imagemPeca").value = "";
+}
+
+function ajustarLayout() {
+    document.querySelectorAll(".image-preview").forEach(img => {
+        img.style.maxWidth = "100px";
+        img.style.height = "auto";
+    });
+    document.querySelector(".form-container").style.display = "flex";
+    document.querySelector(".form-container").style.flexDirection = "column";
+    document.querySelector(".form-container").style.alignItems = "center";
 }
 
 atualizarTabela();
