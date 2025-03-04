@@ -1,15 +1,14 @@
-// script.js - Sistema de Inventário com Firebase + ImgBB
-
-// Configuração do Firebase
+// Inicializa Firebase (Versão compatível com navegador)
 const firebaseConfig = {
     apiKey: "AIzaSyBZUHSvfX-rCPv0kF3y1jgoxzLjz-xF1zU",
     authDomain: "inventario-82fd5.firebaseapp.com",
     projectId: "inventario-82fd5",
-    storageBucket: "inventario-82fd5.appspot.com", // Corrigido
+    storageBucket: "inventario-82fd5.appspot.com",
     messagingSenderId: "505042062581",
     appId: "1:505042062581:web:89a491d9394294a76949bc"
 };
 
+// Configuração e Inicialização do Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
@@ -19,7 +18,7 @@ const imgbbApiKey = "c7150786eeb1856121e2fb3568c8e44a";
 function atualizarTabela() {
     db.collection("pecas").get().then(snapshot => {
         const tabela = document.getElementById("estoque");
-        tabela.innerHTML = ""; // Limpa a tabela antes de preencher
+        tabela.innerHTML = "";
 
         snapshot.forEach(doc => {
             const peca = doc.data();
@@ -125,27 +124,6 @@ function buscarPeca() {
             document.getElementById("resultadoBusca").innerText = "Peça não encontrada no inventário.";
         }
     }).catch(error => console.error("Erro ao buscar peça:", error));
-}
-
-function mostrarImagemPreview() {
-    const imagemFile = document.getElementById("imagemPeca").files[0];
-    if (imagemFile) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const imagemPreview = document.getElementById("imagemPreview");
-            imagemPreview.src = event.target.result;
-            imagemPreview.style.display = "block";
-        };
-        reader.readAsDataURL(imagemFile);
-    }
-}
-
-function limparCampos() {
-    document.getElementById("codigoPeca").value = "";
-    document.getElementById("nomePeca").value = "";
-    document.getElementById("quantidade").value = "";
-    document.getElementById("imagemPeca").value = "";
-    document.getElementById("imagemPreview").style.display = "none";
 }
 
 atualizarTabela();
