@@ -17,12 +17,23 @@ body {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 600px;
+    max-width: 800px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 h2 {
     text-align: center;
     color: #333;
+    width: 100%;
+}
+
+.form-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 input, button {
@@ -65,18 +76,24 @@ th {
     color: white;
 }
 
-pre {
-    background: #333;
-    color: white;
-    padding: 10px;
-    overflow-x: auto;
-    border-radius: 5px;
+.indicators {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
 }
 
+.indicator {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
 
-
-
-
-
-
-
+.image-preview {
+    max-width: 100px;
+    max-height: 100px;
+    display: block;
+    margin-top: 10px;
+}
