@@ -1,102 +1,120 @@
-// script.js - Sistema de Inventário
+// script.js - Sistema de Inventário com Firebase + ImgBB
 
-let pecas = JSON.parse(localStorage.getItem('inventario')) || [];
-let historico = JSON.parse(localStorage.getItem('historico')) || [];
+// Configuração do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBZUHSvfX-rCPv0kF3y1jgoxzLjz-xF1zU",
+    authDomain: "inventario-82fd5.firebaseapp.com",
+    projectId: "inventario-82fd5",
+    storageBucket: "inventario-82fd5.firebasestorage.app",
+    messagingSenderId: "505042062581",
+    appId: "1:505042062581:web:89a491d9394294a76949bc"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Configuração do ImgBB
+const imgbbApiKey = "c7150786eeb1856121e2fb3568c8e44a";
 
 function atualizarTabela() {
-    const tabela = document.getElementById("estoque");
-    tabela.innerHTML = "";
-    pecas.forEach((peca, index) => {
-        tabela.innerHTML += `
-            <tr>
-                <td>${peca.codigo}</td>
-                <td>${peca.nome}</td>
-                <td><img src="${peca.imagem}" class="image-preview"></td>
-                <td>${peca.quantidade}</td>
-                <td>
-                    <button onclick="alterarQuantidade(${index}, 1)">+1</button>
-                    <button onclick="alterarQuantidade(${index}, -1)">-1</button>
-                    <button onclick="removerPeca(${index})">Remover</button>
-                </td>
-            </tr>
-        `;
+    db.collection("pecas").get().then(snapshot => {
+        const tabela = document.getElementById("estoque");
+        tabela.innerHTML = "";
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            tabela.innerHTML += `
+                <tr>
+                    <td>${peca.codigo}</td>
+                    <td>${peca.nome}</td>
+                    <td><img src="${peca.imagem}" class="image-preview"></td>
+                    <td>${peca.quantidade}</td>
+                    <td>
+                        <button onclick="alterarQuantidade('${doc.id}', 1)">+1</button>
+                        <button onclick="alterarQuantidade('${doc.id}', -1)">-1</button>
+                        <button onclick="removerPeca('${doc.id}')">Remover</button>
+                    </td>
+                </tr>
+            `;
+        });
     });
-    ajustarLayout();
-    atualizarIndicadores();
-    localStorage.setItem('inventario', JSON.stringify(pecas));
 }
 
 function adicionarPeca() {
     const codigo = document.getElementById("codigoPeca").value;
     const nome = document.getElementById("nomePeca").value;
     const quantidade = parseInt(document.getElementById("quantidade").value);
-    const imagem = document.getElementById("imagemPeca").files[0];
-    
-    if (pecas.some(peca => peca.codigo === codigo)) {
-        alert(`O código ${codigo} já está cadastrado para a peça ${pecas.find(p => p.codigo === codigo).nome}.`);
+    const imagemFile = document.getElementById("imagemPeca").files[0];
+
+    if (!codigo || !nome || quantidade <= 0 || !imagemFile) {
+        alert("Preencha todos os campos corretamente!");
         return;
     }
 
-    if (codigo && nome && quantidade > 0 && imagem) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            pecas.push({ codigo, nome, quantidade, imagem: e.target.result });
-            historico.push({ codigo, nome, quantidade, tipo: 'entrada', data: new Date().toLocaleString() });
-            localStorage.setItem('historico', JSON.stringify(historico));
-            atualizarTabela();
-            limparCampos();
-        };
-        reader.readAsDataURL(imagem);
-    }
+    db.collection("pecas").where("codigo", "==", codigo).get().then(snapshot => {
+        if (!snapshot.empty) {
+            alert(`O código ${codigo} já está cadastrado.`);
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append("image", imagemFile);
+        
+        fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const imagemURL = data.data.url;
+            db.collection("pecas").add({ codigo, nome, quantidade, imagem: imagemURL }).then(() => {
+                atualizarTabela();
+                limparCampos();
+            });
+        })
+        .catch(error => console.error("Erro no upload da imagem:", error));
+    });
 }
 
-function alterarQuantidade(index, valor) {
-    pecas[index].quantidade += valor;
-    if (pecas[index].quantidade < 0) pecas[index].quantidade = 0;
-    historico.push({ codigo: pecas[index].codigo, nome: pecas[index].nome, quantidade: Math.abs(valor), tipo: valor > 0 ? 'entrada' : 'retirada', data: new Date().toLocaleString() });
-    localStorage.setItem('historico', JSON.stringify(historico));
-    atualizarTabela();
+function alterarQuantidade(id, valor) {
+    db.collection("pecas").doc(id).get().then(doc => {
+        if (doc.exists) {
+            const novaQuantidade = doc.data().quantidade + valor;
+            db.collection("pecas").doc(id).update({ quantidade: Math.max(novaQuantidade, 0) }).then(() => {
+                atualizarTabela();
+            });
+        }
+    });
 }
 
-function removerPeca(index) {
-    pecas.splice(index, 1);
-    atualizarTabela();
+function removerPeca(id) {
+    db.collection("pecas").doc(id).delete().then(() => {
+        atualizarTabela();
+    });
 }
 
 function buscarPeca() {
     const termoBusca = document.getElementById("buscarCodigo").value.toLowerCase();
-    const resultado = pecas.find(peca => peca.codigo.toLowerCase() === termoBusca || peca.nome.toLowerCase().includes(termoBusca));
-    
-    if (resultado) {
-        document.getElementById("resultadoBusca").innerHTML = `
-            <div class='resultado-card'>
-                <img src="${resultado.imagem}" class="image-preview">
-                <p><strong>Código:</strong> ${resultado.codigo}</p>
-                <p><strong>Nome:</strong> ${resultado.nome}</p>
-                <p><strong>Quantidade:</strong> ${resultado.quantidade}</p>
-            </div>
-        `;
-    } else {
-        document.getElementById("resultadoBusca").innerText = "Peça não encontrada no inventário.";
-    }
-}
-
-function gerarRelatorio() {
-    let relatorio = "Relatório de Inventário:\n";
-    pecas.forEach(peca => {
-        relatorio += `Código: ${peca.codigo}, Peça: ${peca.nome}, Quantidade: ${peca.quantidade}\n`;
+    db.collection("pecas").get().then(snapshot => {
+        let resultado = null;
+        snapshot.forEach(doc => {
+            const peca = doc.data();
+            if (peca.codigo.toLowerCase() === termoBusca || peca.nome.toLowerCase().includes(termoBusca)) {
+                resultado = peca;
+            }
+        });
+        if (resultado) {
+            document.getElementById("resultadoBusca").innerHTML = `
+                <div class='resultado-card'>
+                    <img src="${resultado.imagem}" class="image-preview">
+                    <p><strong>Código:</strong> ${resultado.codigo}</p>
+                    <p><strong>Nome:</strong> ${resultado.nome}</p>
+                    <p><strong>Quantidade:</strong> ${resultado.quantidade}</p>
+                </div>
+            `;
+        } else {
+            document.getElementById("resultadoBusca").innerText = "Peça não encontrada no inventário.";
+        }
     });
-    document.getElementById("relatorio").innerText = relatorio;
-}
-
-function atualizarIndicadores() {
-    let maisEstoque = [...pecas].sort((a, b) => b.quantidade - a.quantidade)[0] || { nome: 'Nenhuma', quantidade: 0 };
-    let maisRetirada = [...historico.filter(h => h.tipo === 'retirada')].sort((a, b) => b.quantidade - a.quantidade)[0] || { nome: 'Nenhuma', quantidade: 0 };
-    let maisEntrada = [...historico.filter(h => h.tipo === 'entrada')].sort((a, b) => b.quantidade - a.quantidade)[0] || { nome: 'Nenhuma', quantidade: 0 };
-    
-    document.getElementById("indicadorEstoque").innerText = `Mais em estoque: ${maisEstoque.nome} (${maisEstoque.quantidade})`;
-    document.getElementById("indicadorRetirada").innerText = `Mais retirado: ${maisRetirada.nome} (${maisRetirada.quantidade})`;
-    document.getElementById("indicadorEntrada").innerText = `Mais entrada: ${maisEntrada.nome} (${maisEntrada.quantidade})`;
 }
 
 function limparCampos() {
@@ -104,16 +122,6 @@ function limparCampos() {
     document.getElementById("nomePeca").value = "";
     document.getElementById("quantidade").value = "";
     document.getElementById("imagemPeca").value = "";
-}
-
-function ajustarLayout() {
-    document.querySelectorAll(".image-preview").forEach(img => {
-        img.style.maxWidth = "100px";
-        img.style.height = "auto";
-    });
-    document.querySelector(".form-container").style.display = "flex";
-    document.querySelector(".form-container").style.flexDirection = "column";
-    document.querySelector(".form-container").style.alignItems = "center";
 }
 
 atualizarTabela();
