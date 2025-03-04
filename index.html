@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventário de Peças</title>
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK (versão compatível sem módulos) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 </head>
 <body>
     <header>
@@ -13,6 +18,7 @@
     </header>
 
     <div class="container">
+        <!-- Formulário de Cadastro -->
         <div class="form-container">
             <h2>Adicionar Peça</h2>
             <input type="text" id="codigoPeca" placeholder="Código da Peça">
@@ -25,6 +31,13 @@
             <button onclick="adicionarPeca()">Adicionar Peça</button>
         </div>
 
+        <!-- Busca -->
+        <h3>Buscar Peça</h3>
+        <input type="text" id="buscarCodigo" placeholder="Código ou Nome da Peça">
+        <button onclick="buscarPeca()">Buscar</button>
+        <div id="resultadoBusca"></div>
+
+        <!-- Tabela do Estoque -->
         <h3>Estoque</h3>
         <table>
             <thead>
@@ -38,14 +51,22 @@
             </thead>
             <tbody id="estoque"></tbody>
         </table>
+
+        <!-- Indicadores -->
+        <h3>Indicadores</h3>
+        <div class="indicators">
+            <div class="indicator" id="indicadorEstoque">Mais em estoque: Nenhum</div>
+            <div class="indicator" id="indicadorRetirada">Mais retirado: Nenhum</div>
+            <div class="indicator" id="indicadorEntrada">Mais entrada: Nenhum</div>
+        </div>
+
+        <!-- Relatório -->
+        <h3>Relatório</h3>
+        <button onclick="gerarRelatorio()">Gerar Relatório</button>
+        <pre id="relatorio"></pre>
     </div>
 
-    <!-- Firebase SDK (Colocado no final para evitar erro de importação) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-
-    <!-- Script Principal (defer para garantir que o Firebase carregue antes) -->
+    <!-- Script Principal -->
     <script src="script.js" defer></script>
 </body>
 </html>
