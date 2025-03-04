@@ -5,41 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventário de Peças</title>
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Firebase SDK Compatível -->
+    
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-
-    <!-- Certifique-se que o Firebase carrega antes do script.js -->
-    <script>
-        // Configuração e Inicialização do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBZUHSvfX-rCPv0kF3y1jgoxzLjz-xF1zU",
-            authDomain: "inventario-82fd5.firebaseapp.com",
-            projectId: "inventario-82fd5",
-            storageBucket: "inventario-82fd5.appspot.com",
-            messagingSenderId: "505042062581",
-            appId: "1:505042062581:web:89a491d9394294a76949bc"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-    </script>
 </head>
 <body>
-    <div class="container">
+    <header>
+        <img src="logo.png" alt="Logo da Empresa" class="logo">
         <h2>Controle de Inventário</h2>
-
+    </header>
+    
+    <div class="container">
         <!-- Formulário de Cadastro -->
         <div class="form-container">
             <input type="text" id="codigoPeca" placeholder="Código da Peça">
             <input type="text" id="nomePeca" placeholder="Nome da Peça">
             <input type="number" id="quantidade" placeholder="Quantidade">
-            <input type="file" id="imagemPeca" accept="image/*">
+            <input type="file" id="imagemPeca" accept="image/*" onchange="mostrarImagemPreview()">
+            <div id="previewContainer">
+                <img id="imagemPreview" src="" alt="Prévia da Imagem" style="display:none;">
+            </div>
             <button onclick="adicionarPeca()">Adicionar Peça</button>
         </div>
 
-        <!-- Estoque -->
+        <!-- Busca -->
+        <h3>Buscar Peça</h3>
+        <input type="text" id="buscarCodigo" placeholder="Código ou Nome da Peça">
+        <button onclick="buscarPeca()">Buscar</button>
+        <div id="resultadoBusca"></div>
+
+        <!-- Tabela do Estoque -->
         <h3>Estoque</h3>
         <table>
             <thead>
@@ -53,9 +50,22 @@
             </thead>
             <tbody id="estoque"></tbody>
         </table>
+
+        <!-- Indicadores -->
+        <h3>Indicadores</h3>
+        <div class="indicators">
+            <div class="indicator" id="indicadorEstoque">Mais em estoque: Nenhum</div>
+            <div class="indicator" id="indicadorRetirada">Mais retirado: Nenhum</div>
+            <div class="indicator" id="indicadorEntrada">Mais entrada: Nenhum</div>
+        </div>
+
+        <!-- Relatório -->
+        <h3>Relatório</h3>
+        <button onclick="gerarRelatorio()">Gerar Relatório</button>
+        <pre id="relatorio"></pre>
     </div>
 
-    <!-- Script Principal (Carregado depois do Firebase) -->
-    <script src="script.js"></script>
+    <!-- Script Principal -->
+    <script src="script.js" defer></script>
 </body>
 </html>
