@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Estoque</title>
+    <title>Sistema de Inventário</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,7 +19,7 @@
         <button onclick="buscarPeca()">Buscar</button>
         <p id="resultadoBusca"></p>
         
-        <h2>Estoque</h2>
+        <h2>Inventário</h2>
         <table>
             <thead>
                 <tr>
@@ -31,8 +31,76 @@
             </thead>
             <tbody id="estoque"></tbody>
         </table>
+        
+        <h2>Relatórios</h2>
+        <button onclick="gerarRelatorio()">Gerar Relatório</button>
+        <pre id="relatorio"></pre>
     </div>
-
-    <script src="script.js"></script>
+    
+    <script>
+        let pecas = JSON.parse(localStorage.getItem('inventario')) || [];
+        
+        function atualizarTabela() {
+            const tabela = document.getElementById("estoque");
+            tabela.innerHTML = "";
+            pecas.forEach((peca, index) => {
+                tabela.innerHTML += `
+                    <tr>
+                        <td>${peca.codigo}</td>
+                        <td>${peca.nome}</td>
+                        <td>${peca.quantidade}</td>
+                        <td>
+                            <button onclick="alterarQuantidade(${index}, 1)">+1</button>
+                            <button onclick="alterarQuantidade(${index}, -1)">-1</button>
+                            <button onclick="removerPeca(${index})">Remover</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            localStorage.setItem('inventario', JSON.stringify(pecas));
+        }
+        
+        function adicionarPeca() {
+            const codigo = document.getElementById("codigoPeca").value;
+            const nome = document.getElementById("nomePeca").value;
+            const quantidade = parseInt(document.getElementById("quantidade").value);
+            if (codigo && nome && quantidade > 0) {
+                pecas.push({ codigo, nome, quantidade });
+                atualizarTabela();
+            }
+        }
+        
+        function alterarQuantidade(index, valor) {
+            pecas[index].quantidade += valor;
+            if (pecas[index].quantidade < 0) pecas[index].quantidade = 0;
+            atualizarTabela();
+        }
+        
+        function removerPeca(index) {
+            pecas.splice(index, 1);
+            atualizarTabela();
+        }
+        
+        function buscarPeca() {
+            const codigoBusca = document.getElementById("buscarCodigo").value;
+            const resultado = pecas.find(peca => peca.codigo === codigoBusca);
+            
+            if (resultado) {
+                document.getElementById("resultadoBusca").innerText = `Peça: ${resultado.nome}, Quantidade: ${resultado.quantidade}`;
+            } else {
+                document.getElementById("resultadoBusca").innerText = "Peça não encontrada no inventário.";
+            }
+        }
+        
+        function gerarRelatorio() {
+            let relatorio = "Relatório de Inventário:\n";
+            pecas.forEach(peca => {
+                relatorio += `Código: ${peca.codigo}, Peça: ${peca.nome}, Quantidade: ${peca.quantidade}\n`;
+            });
+            document.getElementById("relatorio").innerText = relatorio;
+        }
+        
+        atualizarTabela();
+    </script>
 </body>
 </html>
