@@ -31,6 +31,12 @@ function adicionarPeca() {
     const nome = document.getElementById("nomePeca").value;
     const quantidade = parseInt(document.getElementById("quantidade").value);
     const imagem = document.getElementById("imagemPeca").files[0];
+    
+    if (pecas.some(peca => peca.codigo === codigo)) {
+        alert(`O código ${codigo} já está cadastrado para a peça ${pecas.find(p => p.codigo === codigo).nome}.`);
+        return;
+    }
+
     if (codigo && nome && quantidade > 0 && imagem) {
         const reader = new FileReader();
         reader.onload = function (e) {
@@ -58,9 +64,21 @@ function removerPeca(index) {
 }
 
 function buscarPeca() {
-    const codigoBusca = document.getElementById("buscarCodigo").value;
-    const resultado = pecas.find(peca => peca.codigo === codigoBusca);
-    document.getElementById("resultadoBusca").innerText = resultado ? `Peça: ${resultado.nome}, Quantidade: ${resultado.quantidade}` : "Peça não encontrada no inventário.";
+    const termoBusca = document.getElementById("buscarCodigo").value.toLowerCase();
+    const resultado = pecas.find(peca => peca.codigo.toLowerCase() === termoBusca || peca.nome.toLowerCase().includes(termoBusca));
+    
+    if (resultado) {
+        document.getElementById("resultadoBusca").innerHTML = `
+            <div class='resultado-card'>
+                <img src="${resultado.imagem}" class="image-preview">
+                <p><strong>Código:</strong> ${resultado.codigo}</p>
+                <p><strong>Nome:</strong> ${resultado.nome}</p>
+                <p><strong>Quantidade:</strong> ${resultado.quantidade}</p>
+            </div>
+        `;
+    } else {
+        document.getElementById("resultadoBusca").innerText = "Peça não encontrada no inventário.";
+    }
 }
 
 function gerarRelatorio() {
