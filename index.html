@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="styles.css">
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js"></script>
 </head>
 <body>
     <header>
-        <img src="https://b2ycompany.github.io/inventario/Bitzer_logo.svg.png" alt="Logo da Empresa" class="logo">
-        <h2>Controle de Inventário</h2>
+        <img src="logo.png" alt="Logo da Empresa" class="logo">
+        <h1>Controle de Inventário</h1>
     </header>
     
     <div class="container">
@@ -50,22 +50,8 @@
             </thead>
             <tbody id="estoque"></tbody>
         </table>
-
-        <!-- Indicadores -->
-        <h3>Indicadores</h3>
-        <div class="indicators">
-            <div class="indicator" id="indicadorEstoque">Mais em estoque: Nenhum</div>
-            <div class="indicator" id="indicadorRetirada">Mais retirado: Nenhum</div>
-            <div class="indicator" id="indicadorEntrada">Mais entrada: Nenhum</div>
-        </div>
-
-        <!-- Relatório -->
-        <h3>Relatório</h3>
-        <button onclick="gerarRelatorio()">Gerar Relatório</button>
-        <pre id="relatorio"></pre>
     </div>
-
-    <!-- Script Principal -->
+    
     <script src="script.js" defer></script>
 </body>
 </html>
