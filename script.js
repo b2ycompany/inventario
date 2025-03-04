@@ -1,4 +1,6 @@
-let pecas = JSON.parse(localStorage.getItem('estoque')) || [];
+// script.js - Sistema de Inventário
+
+let pecas = JSON.parse(localStorage.getItem('inventario')) || [];
 
 function atualizarTabela() {
     const tabela = document.getElementById("estoque");
@@ -17,7 +19,7 @@ function atualizarTabela() {
             </tr>
         `;
     });
-    localStorage.setItem('estoque', JSON.stringify(pecas));
+    localStorage.setItem('inventario', JSON.stringify(pecas));
 }
 
 function adicionarPeca() {
@@ -48,8 +50,16 @@ function buscarPeca() {
     if (resultado) {
         document.getElementById("resultadoBusca").innerText = `Peça: ${resultado.nome}, Quantidade: ${resultado.quantidade}`;
     } else {
-        document.getElementById("resultadoBusca").innerText = "Peça não encontrada no estoque.";
+        document.getElementById("resultadoBusca").innerText = "Peça não encontrada no inventário.";
     }
+}
+
+function gerarRelatorio() {
+    let relatorio = "Relatório de Inventário:\n";
+    pecas.forEach(peca => {
+        relatorio += `Código: ${peca.codigo}, Peça: ${peca.nome}, Quantidade: ${peca.quantidade}\n`;
+    });
+    document.getElementById("relatorio").innerText = relatorio;
 }
 
 atualizarTabela();
